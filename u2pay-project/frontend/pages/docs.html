@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>U2PAY Documentation & FAQ</title>
+    <script>
+        // Load theme before rendering to prevent flicker
+        (function() {
+            const theme = localStorage.getItem('u2pay-theme') || 'dark-mode';
+            document.documentElement.className = theme;
+        })();
+    </script>
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #8b5cf6;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --bg-dark: #0f172a;
+            --bg-light: #f8fafc;
+            --text-dark: #1e293b;
+            --text-light: #f8fafc;
+            --border-color: #e2e8f0;
+            --border-dark: #334155;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        body.dark-mode {
+            background: var(--bg-dark);
+            color: var(--text-light);
+        }
+
+        body.light-mode {
+            background: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        .doc-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .doc-header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .doc-header p {
+            margin: 0.5rem 0 0 0;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+        }
+
+        .doc-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-buttons a {
+            padding: 0.75rem 1.5rem;
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .nav-buttons a:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .section {
+            background: #1e293b;
+            border: 1px solid var(--border-dark);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+
+        body.dark-mode .section {
+            background: #1e293b;
+            border: 1px solid var(--border-dark);
+            color: var(--text-light);
+        }
+
+        body.light-mode .section {
+            background: #f1f5f9;
+            border: 1px solid var(--border-color);
+            color: var(--text-dark);
+        }
+
+        .section h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.75rem;
+        }
+
+        .section h3 {
+            color: var(--secondary-color);
+            margin-top: 1.5rem;
+        }
+
+        .faq-item {
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            background: #0f172a;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .faq-item {
+            background: #0f172a;
+        }
+
+        body.light-mode .faq-item {
+            background: #e2e8f0;
+        }
+
+        .faq-item:hover {
+            background: #1a2332;
+            transform: translateX(5px);
+        }
+
+        body.light-mode .faq-item:hover {
+            background: #cbd5e1;
+            transform: translateX(5px);
+        }
+
+        .faq-question {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .faq-question::before {
+            content: '▶';
+            transition: transform 0.3s ease;
+            display: inline-block;
+            width: 20px;
+        }
+
+        .faq-item.open .faq-question::before {
+            transform: rotate(90deg);
+        }
+
+        .faq-answer {
+            display: none;
+            margin-top: 1rem;
+            color: var(--text-light);
+            line-height: 1.8;
+            transition: color 0.3s ease;
+        }
+
+        body.light-mode .faq-answer {
+            color: var(--text-dark);
+        }
+
+        .faq-item.open .faq-answer {
+            display: block;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .feature-card {
+            background: #0f172a;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-dark);
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .feature-card {
+            background: #0f172a;
+            border: 1px solid var(--border-dark);
+        }
+
+        body.light-mode .feature-card {
+            background: #e2e8f0;
+            border: 1px solid var(--border-color);
+        }
+
+        .feature-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+        }
+
+        .feature-card h4 {
+            margin: 0 0 0.5rem 0;
+            color: var(--primary-color);
+        }
+
+        .feature-card p {
+            margin: 0;
+            color: var(--text-light);
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+
+        body.light-mode .feature-card p {
+            color: var(--text-dark);
+        }
+
+        .contact-section {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(99, 102, 241, 0.1));
+            border: 2px solid var(--success-color);
+            padding: 2rem;
+            border-radius: var(--radius);
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .contact-section h3 {
+            margin-top: 0;
+            color: var(--success-color);
+        }
+
+        .contact-info {
+            font-size: 1.1rem;
+            margin: 1rem 0;
+        }
+
+        .contact-info a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .contact-info a:hover {
+            color: var(--secondary-color);
+            text-decoration: underline;
+        }
+
+        .doc-footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid var(--border-dark);
+            color: #6b7280;
+            margin-top: 2rem;
+            transition: border-color 0.3s ease, color 0.3s ease;
+        }
+
+        body.dark-mode .doc-footer {
+            border-top: 1px solid var(--border-dark);
+            color: #6b7280;
+        }
+
+        body.light-mode .doc-footer {
+            border-top: 1px solid var(--border-color);
+            color: #64748b;
+        }
+
+        code {
+            background: #0f172a;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            color: #10b981;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            transition: background 0.3s ease;
+        }
+
+        body.light-mode code {
+            background: #e2e8f0;
+            color: #059669;
+        }
+
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: var(--border-dark);
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+
+        body.dark-mode .back-button {
+            background: var(--border-dark);
+            color: var(--text-light);
+        }
+
+        body.light-mode .back-button {
+            background: var(--border-color);
+            color: var(--text-dark);
+        }
+
+        .back-button:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .doc-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .doc-container {
+                padding: 1rem;
+            }
+
+            .section {
+                padding: 1.5rem;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+            }
+
+            .nav-buttons a {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body class="dark-mode">
+    <!-- Header -->
+    <div class="doc-header">
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div>
+                <h1>⚡ U2PAY Documentation</h1>
+                <p>Web3 Continuous Flow Payment Rail - Complete Guide</p>
+            </div>
+            <button id="themeToggle" style="background: rgba(255,255,255,0.2); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; cursor: pointer; font-size: 0.95rem; font-weight: 600;">🌙 Dark</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="doc-container">
+        <a href="../index.html" class="back-button">← Back to Application</a>
+
+        <!-- Quick Navigation -->
+        <div class="nav-buttons">
+            <a href="#overview">Overview</a>
+            <a href="#features">Features</a>
+            <a href="#faq">FAQ</a>
+            <a href="#contact">Contact</a>
+        </div>
+
+        <!-- Overview Section -->
+        <div class="section" id="overview">
+            <h2>📖 Overview</h2>
+            <p><strong>U2PAY</strong> is a Web3 Continuous Flow Payment Rail that allows users to pay only for what they use. It combines blockchain technology with real-time payment streaming for transparent and fair pricing.</p>
+            
+            <h3>How It Works</h3>
+            <ol>
+                <li><strong>Connect Wallet</strong> - Use MetaMask or Gmail authentication</li>
+                <li><strong>Define Service Cost</strong> - Set the real-world service price (required)</li>
+                <li><strong>Select Billing Mode</strong> - Choose Balance-Based or Time-Based billing</li>
+                <li><strong>Start Service</strong> - Begin using the service with real-time cost tracking</li>
+                <li><strong>Stop & Settle</strong> - Stop service and pay the exact amount used</li>
+            </ol>
+
+            <h3>Key Principle</h3>
+            <p><em>"Pay Only What You Use"</em> - Fair, transparent pricing with nanosecond-level precision.</p>
+        </div>
+
+        <!-- Features Section -->
+        <div class="section" id="features">
+            <h2>🎯 Key Features</h2>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>🔐 Dual Authentication</h4>
+                    <p>MetaMask for Web3 users or Gmail with secure password authentication</p>
+                </div>
+                <div class="feature-card">
+                    <h4>⚙️ Service Cost Definition</h4>
+                    <p>Mandatory cost definition ensures economic validity (INR, USD, EUR supported)</p>
+                </div>
+                <div class="feature-card">
+                    <h4>💰 Balance-Based Streaming</h4>
+                    <p>Set maximum spending limit and service auto-stops when reached</p>
+                </div>
+                <div class="feature-card">
+                    <h4>⏱️ Time-Based Precision</h4>
+                    <p>Track exact service duration and charge only for time used</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🔗 Blockchain Settlement</h4>
+                    <p>Secure payment settlement using Ethereum smart contracts</p>
+                </div>
+                <div class="feature-card">
+                    <h4>📊 Real-Time Monitoring</h4>
+                    <p>Live cost and time tracking with HH:MM:SS precision display</p>
+                </div>
+                <div class="feature-card">
+                    <h4>📱 IoT Integration</h4>
+                    <p>Simulated device support for testing and demonstration</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🌙 Theme Support</h4>
+                    <p>Dark and light mode for comfortable usage any time</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="section" id="faq">
+            <h2>❓ Frequently Asked Questions</h2>
+
+            <div class="faq-item">
+                <div class="faq-question">What is service cost definition and why is it mandatory?</div>
+                <div class="faq-answer">
+                    Service cost definition tells the system how much the real-world service costs per unit time (e.g., ₹50/hour). It's mandatory because without it, the system cannot calculate fair pricing. Both billing modes depend on this value to determine how much you pay for the service you use.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">What's the difference between Balance-Based and Time-Based billing?</div>
+                <div class="faq-answer">
+                    <strong>Balance-Based:</strong> You set a maximum spending limit (e.g., ₹500). The service runs and auto-stops when you reach that limit. Useful when you have a fixed budget.<br>
+                    <strong>Time-Based:</strong> You start the service and pay for exactly the time you use. Useful when you want precise control over duration.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Do I need a MetaMask wallet to use U2PAY?</div>
+                <div class="faq-answer">
+                    No. U2PAY offers two authentication options: MetaMask (for Web3 users) or Gmail with password (for regular users). Choose whichever suits you best.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Is my Gmail password stored securely?</div>
+                <div class="faq-answer">
+                    Yes. Passwords are hashed using SHA-256 encryption before storage. They are never stored in plaintext. Your session is also encrypted and stored locally on your device.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">What currencies are supported for service cost?</div>
+                <div class="faq-answer">
+                    Three currencies are supported: <strong>INR (₹)</strong>, <strong>USD ($)</strong>, and <strong>EUR (€)</strong>. You can select any of these when defining service cost.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">What time units can I use for service cost?</div>
+                <div class="faq-answer">
+                    Three time units are supported: <strong>Minute</strong>, <strong>Hour</strong>, and <strong>Day</strong>. For example, you can set a cost like "₹50/hour" or "₹100/day".
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">How does the system calculate cost?</div>
+                <div class="faq-answer">
+                    The system uses a simple formula: <code>cost = elapsed_nanoseconds × cost_per_nanosecond</code>. This provides nanosecond-level precision, ensuring you pay for exactly what you use.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">What happens if I forget my Gmail password?</div>
+                <div class="faq-answer">
+                    Currently, there's no password recovery feature. You would need to sign up again with your Gmail address and create a new account. For future versions, we plan to add password reset functionality.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Can I change my service cost after I start billing?</div>
+                <div class="faq-answer">
+                    Not during an active session. You must stop the current service first. Once stopped, you can redefine the service cost and start a new session.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">How do I settle a payment?</div>
+                <div class="faq-answer">
+                    After stopping the service, click the "💸 Settle & Pay" button. The system will calculate the total cost and prompt you to confirm payment. The amount will be converted to ETH at the current exchange rate and transferred from your connected wallet.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">What is the IoT Device Simulator?</div>
+                <div class="faq-answer">
+                    The IoT Device Simulator is a testing feature that simulates a connected device consuming power and data. It's useful for testing billing modes without a real device. Click "Start Device" to begin simulation.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Can I export my session data?</div>
+                <div class="faq-answer">
+                    Yes! Click the "📥 Export Data" button in the Settings panel. This will download your complete session history as a JSON file for record-keeping or analysis.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Is my data stored on a server?</div>
+                <div class="faq-answer">
+                    U2PAY is designed to be privacy-first. Your data is primarily stored locally on your device using browser storage (localStorage). Smart contracts on Ethereum maintain immutable records of payments, but personal session data is not stored on external servers.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">What blockchain network does U2PAY use?</div>
+                <div class="faq-answer">
+                    U2PAY uses Ethereum (ETH) for payment settlement. Ensure your MetaMask is connected to the correct Ethereum network (Mainnet, Sepolia testnet, or other configured networks).
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Section -->
+        <div class="contact-section" id="contact">
+            <h3>📧 Contact Developer</h3>
+            <p>Found a bug? Have a suggestion? Want to report an issue?</p>
+            
+            <div class="contact-info">
+                <strong>Email for Bug Reports & Support:</strong><br>
+                <a href="mailto:samirsharma854@gmail.com">samirsharma854@gmail.com</a>
+            </div>
+
+            <p style="margin-top: 1.5rem; font-size: 0.95rem; color: #9ca3af;">
+                Please include details about the issue, steps to reproduce, and any relevant screenshots when reporting bugs.
+            </p>
+        </div>
+
+        <!-- Quick Start Guide -->
+        <div class="section">
+            <h2>🚀 Quick Start Guide</h2>
+            
+            <h3>For First-Time Users:</h3>
+            <ol>
+                <li><strong>Choose Authentication:</strong> Click "Connect MetaMask" or "Gmail Sign-Up"</li>
+                <li><strong>Define Service Cost:</strong> Enter service name, cost, currency, and time unit</li>
+                <li><strong>Select Billing Mode:</strong> Choose Balance-Based or Time-Based</li>
+                <li><strong>Configure Settings:</strong> Set spending limit or review cost details</li>
+                <li><strong>Start Service:</strong> Click "Start Service" to begin</li>
+                <li><strong>Monitor:</strong> Watch real-time cost and time updates</li>
+                <li><strong>Stop & Pay:</strong> Click "Stop Service" then "Settle & Pay"</li>
+            </ol>
+
+            <h3>Tips for Best Experience:</h3>
+            <ul>
+                <li>Always define service cost before selecting a billing mode</li>
+                <li>For Balance-Based mode, set a limit you're comfortable with</li>
+                <li>Check your wallet balance before settling payments</li>
+                <li>Use the IoT simulator to test features without real devices</li>
+                <li>Export data regularly for backup purposes</li>
+                <li>Enable notifications to get alerts when limits are reached</li>
+            </ul>
+        </div>
+
+        <!-- Technical Details -->
+        <div class="section">
+            <h2>⚙️ Technical Details</h2>
+            
+            <h3>Precision & Calculations:</h3>
+            <ul>
+                <li>Nanosecond-level precision (1 second = 1,000,000,000 nanoseconds)</li>
+                <li>BigInt arithmetic to prevent floating-point rounding errors</li>
+                <li>Time displayed as HH:MM:SS (never raw nanoseconds)</li>
+                <li>Cost formula: <code>cost = elapsed_ns × cost_per_ns</code></li>
+            </ul>
+
+            <h3>Supported Standards:</h3>
+            <ul>
+                <li><strong>Currencies:</strong> INR (₹), USD ($), EUR (€)</li>
+                <li><strong>Time Units:</strong> Minute, Hour, Day</li>
+                <li><strong>Blockchain:</strong> Ethereum (ETH)</li>
+                <li><strong>Smart Contracts:</strong> Solidity 0.8.0+</li>
+                <li><strong>Authentication:</strong> MetaMask + Gmail/SHA-256</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="doc-footer">
+        <p>&copy; 2026 U2PAY | Web3 Continuous Flow Payment Rail | Pay Only What You Use</p>
+        <p><a href="../index.html" style="color: var(--primary-color); text-decoration: none;">Return to Application →</a></p>
+    </div>
+
+    <script>
+        // FAQ Toggle Functionality
+        document.querySelectorAll('.faq-item').forEach(item => {
+            item.addEventListener('click', function() {
+                this.classList.toggle('open');
+            });
+        });
+
+        // Smooth scrolling for nav buttons
+        document.querySelectorAll('.nav-buttons a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href.startsWith('#')) {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            });
+        });
+
+        // Theme toggle
+        document.getElementById('themeToggle')?.addEventListener('click', function() {
+            const isDark = document.documentElement.classList.contains('dark-mode');
+            const newTheme = isDark ? 'light-mode' : 'dark-mode';
+            
+            document.body.className = newTheme;
+            document.documentElement.className = newTheme;
+            localStorage.setItem('u2pay-theme', newTheme);
+            
+            this.textContent = newTheme === 'dark-mode' ? '☀️ Light' : '🌙 Dark';
+        });
+        
+        // Initialize theme button text on page load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                const isDark = document.documentElement.classList.contains('dark-mode');
+                const themeBtn = document.getElementById('themeToggle');
+                if (themeBtn) {
+                    themeBtn.textContent = isDark ? '☀️ Light' : '🌙 Dark';
+                }
+            });
+        } else {
+            const isDark = document.documentElement.classList.contains('dark-mode');
+            const themeBtn = document.getElementById('themeToggle');
+            if (themeBtn) {
+                themeBtn.textContent = isDark ? '☀️ Light' : '🌙 Dark';
+            }
+        }
+    </script>
+</body>
+</html>

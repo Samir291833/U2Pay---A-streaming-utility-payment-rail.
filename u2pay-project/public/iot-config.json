@@ -1,0 +1,35 @@
+{
+  "devices": [
+    {
+      "deviceId": "charger-001",
+      "deviceType": "charger",
+      "location": "NYC-HQ",
+      "spendingLimit": 500,
+      "consumptionRate": 0.5
+    },
+    {
+      "deviceId": "charger-002",
+      "deviceType": "charger",
+      "location": "SF-Office",
+      "spendingLimit": 300,
+      "consumptionRate": 0.3
+    },
+    {
+      "deviceId": "wifi-001",
+      "deviceType": "wifi",
+      "location": "Cafe",
+      "spendingLimit": 200,
+      "consumptionRate": 0.2
+    },
+    {
+      "deviceId": "gate-001",
+      "deviceType": "gate",
+      "location": "Parking",
+      "spendingLimit": 100,
+      "consumptionRate": 0.1
+    }
+  ],
+  "mqttBroker": "mqtt://localhost:1883",
+  "updateInterval": 1000,
+  "statusPublishInterval": 5000
+}

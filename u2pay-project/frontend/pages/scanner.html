@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Address Safety Scanner - U2PAY</title>
+    <link rel="stylesheet" href="../styles/style.css">
+    <script>
+        // Load theme before rendering to prevent flicker
+        (function() {
+            const theme = localStorage.getItem('u2pay-theme') || 'dark-mode';
+            document.documentElement.className = theme;
+        })();
+    </script>
+    <style>
+        /* Scanner-specific styling */
+        .scanner-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+
+        .scanner-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .scanner-header h1 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 2rem;
+        }
+
+        .scanner-header p {
+            margin: 0.5rem 0 0 0;
+            color: var(--text-primary);
+            opacity: 0.8;
+        }
+
+        .scanner-form {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: var(--radius);
+            margin-bottom: 2rem;
+            border: 1px solid var(--border);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #0f172a;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: 'Courier New', monospace;
+            box-sizing: border-box;
+        }
+
+        body.light-mode .form-group input,
+        body.light-mode .form-group select {
+            background: #ffffff;
+        }
+
+        body.dark-mode .form-group input,
+        body.dark-mode .form-group select {
+            background: #0f172a;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .scan-button {
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .scan-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .scan-button:active {
+            transform: translateY(0);
+        }
+
+        .scan-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .scanner-results {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            min-height: 300px;
+        }
+
+        .result-card {
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid;
+        }
+
+        .result-safe {
+            background: rgba(16, 185, 129, 0.1);
+            border-left-color: #10b981;
+        }
+
+        .result-caution {
+            background: rgba(245, 158, 11, 0.1);
+            border-left-color: #f59e0b;
+        }
+
+        .result-risky {
+            background: rgba(239, 68, 68, 0.1);
+            border-left-color: #ef4444;
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 0 0 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .result-safe .result-title {
+            color: #10b981;
+        }
+
+        .result-caution .result-title {
+            color: #f59e0b;
+        }
+
+        .result-risky .result-title {
+            color: #ef4444;
+        }
+
+        .result-findings {
+            margin-bottom: 1.5rem;
+        }
+
+        .result-findings h3 {
+            margin: 0 0 0.75rem 0;
+            font-size: 0.95rem;
+            opacity: 0.8;
+        }
+
+        .result-findings ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+
+        .result-findings li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+        }
+
+        .result-score {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .score-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .score-fill {
+            height: 100%;
+            background: var(--success-color);
+            transition: width 0.3s ease;
+        }
+
+        .result-safe .score-fill {
+            background: #10b981;
+        }
+
+        .result-caution .score-fill {
+            background: #f59e0b;
+        }
+
+        .result-risky .score-fill {
+            background: #ef4444;
+        }
+
+        .score-text {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .result-disclaimer {
+            background: var(--bg-primary);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 3px solid var(--warning-color);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            margin-top: 1.5rem;
+        }
+
+        .result-address {
+            background: var(--bg-primary);
+            padding: 0.75rem;
+            border-radius: 6px;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            color: var(--primary-color);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            opacity: 0.6;
+        }
+
+        .empty-state p {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: var(--border-dark);
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .back-button:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        body.dark-mode .back-button {
+            background: #334155;
+            color: #f8fafc;
+        }
+
+        body.light-mode .back-button {
+            background: #cbd5e1;
+            color: #1e293b;
+        }
+
+        body.dark-mode .back-button:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        body.light-mode .back-button:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(99, 102, 241, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .scanner-container {
+                padding: 1rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .scanner-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body class="dark-mode">
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-container">
+            <h1 class="logo">⚡ U2PAY</h1>
+            <p class="tagline">Address Safety Scanner</p>
+            <div class="header-controls">
+                <button id="themeToggle" class="theme-btn">🌙 Dark</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Scanner Container -->
+    <div class="scanner-container">
+        <div class="header-row">
+            <button class="back-button" onclick="window.location.href='../index.html'">← Back to U2PAY</button>
+        </div>
+
+        <div class="scanner-header">
+            <h1>🔍 Blockchain Address Safety Scanner</h1>
+            <p>Verify address safety before interacting with blockchain services</p>
+        </div>
+
+        <!-- Scanner Form -->
+        <div class="scanner-form">
+            <div class="form-group">
+                <label for="addressInput">Blockchain Address</label>
+                <input type="text" id="addressInput" placeholder="0x742d35Cc6634C0532925a3b844Bc9e7595f42B2e" spellcheck="false">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="networkSelect">Network</label>
+                    <select id="networkSelect">
+                        <option value="ethereum">Ethereum</option>
+                        <option value="polygon">Polygon</option>
+                        <option value="bsc">Binance Smart Chain (BSC)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="addressTypeSelect">Address Type (Optional)</label>
+                    <select id="addressTypeSelect">
+                        <option value="auto">Auto-detect</option>
+                        <option value="eoa">EOA (User Account)</option>
+                        <option value="contract">Contract</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="scan-button" id="scanButton">Scan Address</button>
+        </div>
+
+        <!-- Results Section -->
+        <div class="scanner-results" id="resultsContainer">
+            <div class="empty-state">
+                <p>👉 Enter an address and click "Scan Address" to begin analysis</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="scanner.js"></script>
+</body>
+</html>

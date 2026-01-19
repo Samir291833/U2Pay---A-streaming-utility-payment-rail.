@@ -1,0 +1,797 @@
+/* ============================================
+   U2PAY - Web3 Payment Rail Styling
+   ============================================ */
+
+:root {
+    --primary-color: #6366f1;
+    --secondary-color: #8b5cf6;
+    --success-color: #10b981;
+    --danger-color: #ef4444;
+    --warning-color: #f59e0b;
+    --bg-dark: #0f172a;
+    --bg-light: #f8fafc;
+    --text-dark: #1e293b;
+    --text-light: #f8fafc;
+    --border-color: #e2e8f0;
+    --border-dark: #334155;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --radius: 12px;
+}
+
+body.light-mode {
+    --bg-primary: var(--bg-light);
+    --text-primary: var(--text-dark);
+    --bg-secondary: #ffffff;
+    --border: var(--border-color);
+}
+
+body.dark-mode {
+    --bg-primary: var(--bg-dark);
+    --text-primary: var(--text-light);
+    --bg-secondary: #1e293b;
+    --border: var(--border-dark);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    line-height: 1.6;
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+
+.app-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    border-bottom: 2px solid var(--secondary-color);
+}
+
+.header-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.logo {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.tagline {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-top: -0.5rem;
+}
+
+.header-controls {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.theme-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.theme-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.wallet-status {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 0.9rem;
+}
+
+.wallet-address {
+    word-break: break-all;
+}
+
+/* ============================================
+   MAIN CONTAINER
+   ============================================ */
+
+.main-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.panel {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.panel h2 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 0.5rem;
+}
+
+.panel h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
+    color: var(--secondary-color);
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+
+.btn-primary, .btn-secondary, .btn-success, .btn-danger {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 12px rgba(99, 102, 241, 0.3);
+}
+
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background: var(--border);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+    background: var(--border);
+    opacity: 0.8;
+}
+
+.btn-success {
+    background: var(--success-color);
+    color: white;
+}
+
+.btn-success:hover:not(:disabled) {
+    background: #059669;
+    transform: translateY(-2px);
+}
+
+.btn-success:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-danger {
+    background: var(--danger-color);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+}
+
+/* ============================================
+   INPUT GROUPS
+   ============================================ */
+
+.input-group {
+    margin-bottom: 1rem;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.currency-input, .time-pricing {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.currency-input select, .currency-input input,
+.time-pricing input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.currency-input select {
+    flex: 0.4;
+}
+
+.service-cost-input-group {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.service-cost-input-group select {
+    flex: 0.35;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.service-cost-input-group input {
+    flex: 0.4;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.service-cost-input-group span {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.currency-input input:focus,
+.time-pricing input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Dark mode: Make input boxes black */
+body.dark-mode .currency-input select,
+body.dark-mode .currency-input input,
+body.dark-mode .time-pricing input,
+body.dark-mode .service-cost-input-group select,
+body.dark-mode .service-cost-input-group input {
+    background: #0f172a;
+}
+
+/* Light mode: Keep input boxes white */
+body.light-mode .currency-input select,
+body.light-mode .currency-input input,
+body.light-mode .time-pricing input,
+body.light-mode .service-cost-input-group select,
+body.light-mode .service-cost-input-group input {
+    background: #ffffff;
+}
+
+.time-pricing {
+    flex-direction: column;
+}
+
+.time-pricing > div {
+    display: flex;
+    flex-direction: column;
+}
+
+.time-pricing label {
+    margin-bottom: 0.3rem;
+    font-size: 0.9rem;
+}
+
+/* ============================================
+   SERVICE COST DEFINITION
+   ============================================ */
+
+.service-cost-section {
+    background: var(--bg-secondary);
+    border: 2px solid var(--primary-color);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.service-cost-section h2 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+
+.service-cost-section .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.service-cost-section .form-row.full {
+    grid-template-columns: 1fr;
+}
+
+.service-cost-section input,
+.service-cost-section select {
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-family: inherit;
+}
+
+.service-cost-section input:focus,
+.service-cost-section select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.service-cost-section button {
+    padding: 0.75rem 1.5rem;
+    background: var(--success-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.service-cost-section button:hover:not(:disabled) {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+#serviceCostStatus {
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    display: none;
+}
+
+#serviceCostStatus.success {
+    display: block;
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success-color);
+    border-left: 3px solid var(--success-color);
+}
+
+#serviceCostStatus.error {
+    display: block;
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger-color);
+    border-left: 3px solid var(--danger-color);
+}
+
+/* ============================================
+   MODE SELECTOR
+   ============================================ */
+
+.mode-selector {
+    margin-bottom: 1.5rem;
+}
+
+.mode-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.mode-btn {
+    padding: 1rem;
+    border: 2px solid var(--border);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.mode-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #6b7280;
+}
+
+.mode-btn:disabled:hover {
+    border-color: var(--border);
+}
+
+.mode-btn.active {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+    color: white;
+}
+
+.mode-btn.active:disabled {
+    opacity: 0.5;
+    background: #4f46e5;
+}
+
+.mode-btn:hover:not(:disabled) {
+    border-color: var(--secondary-color);
+}
+
+/* ============================================
+   MODE CONTENT
+   ============================================ */
+
+.mode-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.mode-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   METRICS
+   ============================================ */
+
+.live-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.metric-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.metric-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+}
+
+.metric-label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    opacity: 0.7;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.metric-value {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    word-break: break-word;
+}
+
+/* ============================================
+   SERVICE CONTROLS
+   ============================================ */
+
+.service-controls {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.service-controls button {
+    flex: 1;
+}
+
+/* ============================================
+   SETTINGS PANEL
+   ============================================ */
+
+.setting-item {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.setting-item label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.setting-item input[type="checkbox"] {
+    margin-right: 0.5rem;
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+}
+
+.setting-item input[type="number"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+/* Dark mode: Make spending cap input black */
+body.dark-mode .setting-item input[type="number"] {
+    background: #0f172a;
+}
+
+/* Light mode: Keep spending cap input white */
+body.light-mode .setting-item input[type="number"] {
+    background: #ffffff;
+}
+
+.setting-item small {
+    display: block;
+    margin-top: 0.3rem;
+    opacity: 0.7;
+    font-size: 0.85rem;
+}
+
+.summary-box {
+    background: var(--bg-primary);
+    border-left: 4px solid var(--primary-color);
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+}
+
+.summary-box p {
+    margin-bottom: 0.5rem;
+}
+
+.summary-box span {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.status-idle {
+    color: #6b7280;
+}
+
+.status-active {
+    color: var(--success-color);
+    font-weight: 700;
+}
+
+.status-limited {
+    color: var(--warning-color);
+    font-weight: 700;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 1.5rem 0;
+}
+
+/* ============================================
+   IoT PANEL
+   ============================================ */
+
+.iot-panel {
+    grid-column: 1 / -1;
+}
+
+.iot-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.device-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
+
+.device-card:hover {
+    border-color: var(--primary-color);
+}
+
+.device-card h4 {
+    margin-bottom: 1rem;
+    color: var(--secondary-color);
+}
+
+.device-card p {
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.device-status-idle {
+    color: #6b7280;
+}
+
+.device-status-active {
+    color: var(--success-color);
+    font-weight: 700;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+
+.app-footer {
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border);
+    padding: 1.5rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    opacity: 0.8;
+    margin-top: 2rem;
+}
+
+.app-footer p {
+    margin-bottom: 0.5rem;
+}
+
+.app-footer a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.app-footer a:hover {
+    text-decoration: underline;
+}
+
+/* ============================================
+   UTILITIES
+   ============================================ */
+
+.hidden {
+    display: none !important;
+}
+
+.visible {
+    display: block !important;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .main-container {
+        grid-template-columns: 1fr;
+    }
+
+    .iot-panel {
+        grid-column: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .mode-buttons {
+        grid-template-columns: 1fr;
+    }
+
+    .live-metrics {
+        grid-template-columns: 1fr;
+    }
+
+    .iot-controls {
+        grid-template-columns: 1fr;
+    }
+
+    .main-container {
+        padding: 1rem;
+    }
+
+    .panel {
+        padding: 1rem;
+    }
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.slideIn {
+    animation: slideIn 0.3s ease;
+}

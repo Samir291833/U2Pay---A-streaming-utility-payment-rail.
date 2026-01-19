@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>U2PAY - Web3 Continuous Flow Payment Rail</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <script>
+        // Load theme before rendering to prevent flicker
+        (function() {
+            const theme = localStorage.getItem('u2pay-theme') || 'dark-mode';
+            document.documentElement.className = theme;
+        })();
+    </script>
+    <script>
+        // CRITICAL: Detect MetaMask early before page fully loads
+        // This runs in the <head> before body renders, giving MetaMask time to inject
+        window.metaMaskDetectionStartTime = Date.now();
+        window.metaMaskInjected = false;
+        
+        // Listen for ethereum#initialized event
+        document.addEventListener('ethereum#initialized', () => {
+            window.metaMaskInjected = true;
+            console.log('✅ [HEAD] ethereum#initialized event fired at', Date.now() - window.metaMaskDetectionStartTime, 'ms');
+        });
+        
+        // Also check if already injected
+        if (window.ethereum?.isMetaMask) {
+            window.metaMaskInjected = true;
+            console.log('✅ [HEAD] MetaMask already injected');
+        }
+        
+        // Aggressive polling during page load (first 10 seconds)
+        let pollCount = 0;
+        const pollInterval = setInterval(() => {
+            pollCount++;
+            if (window.ethereum?.isMetaMask) {
+                window.metaMaskInjected = true;
+                console.log('✅ [HEAD] MetaMask detected via polling at', Date.now() - window.metaMaskDetectionStartTime, 'ms (poll #' + pollCount + ')');
+                clearInterval(pollInterval);
+            }
+            // Stop after 10 seconds
+            if (pollCount > 40) {
+                clearInterval(pollInterval);
+                if (!window.metaMaskInjected) {
+                    console.warn('⚠️ [HEAD] MetaMask not detected after 10 seconds of polling');
+                }
+            }
+        }, 250);
+    </script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-container">
+            <h1 class="logo">⚡ U2PAY</h1>
+            <p class="tagline">Pay Only What You Use</p>
+            <div class="header-controls">
+                <button id="themeToggle" class="theme-btn">🌙 Dark</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-container">
+        <!-- Left Panel: Wallet & Authentication -->
+        <section class="panel wallet-panel">
+            <h2>Wallet Connection</h2>
+            <div id="authSection">
+                <button id="connectMetaMask" class="btn-primary">Connect MetaMask</button>
+                <button id="connectWalletConnect" class="btn-secondary">Wallet Connect</button>
+                <button id="connectGmail" class="btn-secondary">Gmail Login</button>
+                <button id="connectGmailSignup" class="btn-secondary">Gmail Sign-Up</button>
+                <button id="addressSafetyScanner" class="btn-secondary" style="margin-top: 0.5rem;">🔍 Address Safety Scanner</button>
+            </div>
+            <div id="linkedWallet" class="hidden">
+                <p><strong>Connected:</strong> <span id="connectedAddress"></span></p>
+                <p><strong>Balance:</strong> <span id="walletBalance">0.00</span> ETH</p>
+                <button id="disconnectWallet" class="btn-secondary">Disconnect</button>
+            </div>
+        </section>
+
+        <!-- Center Panel: Service Cost Definition (MANDATORY) -->
+        <section class="panel payment-panel">
+            <div class="service-cost-section">
+                <h2>⚙️ Service Cost Definition (Required)</h2>
+                <p style="font-size: 0.9em; color: #6b7280; margin-bottom: 1rem;">Define the real-world service cost before starting billing.</p>
+                
+                <div class="input-group">
+                    <label>Service Name</label>
+                    <input type="text" id="serviceName" placeholder="e.g., Wi-Fi, Charger, Toll Gate" maxlength="50">
+                </div>
+
+                <div class="input-group">
+                    <label>Service Cost</label>
+                    <div class="service-cost-input-group">
+                        <select id="serviceCostCurrency">
+                            <option value="INR">₹ INR</option>
+                            <option value="USD">$ USD</option>
+                            <option value="EUR">€ EUR</option>
+                        </select>
+                        <input type="number" id="serviceCostValue" placeholder="e.g., 50" min="0.01" step="0.01">
+                        <span>per</span>
+                        <select id="serviceCostTimeUnit">
+                            <option value="minute">Minute</option>
+                            <option value="hour" selected>Hour</option>
+                            <option value="day">Day</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button id="defineServiceCost" class="btn-primary" style="width: 100%;">✓ Define Cost</button>
+                <div id="serviceCostStatus" style="margin-top: 0.5rem; padding: 0.5rem; border-radius: 4px; text-align: center; font-size: 0.9em; display: none;"></div>
+            </div>
+
+            <!-- Payment Mode Selection (enabled only after service cost defined) -->
+            <div class="mode-selector">
+                <h2>Payment Mode</h2>
+                <div class="mode-buttons">
+                    <button class="mode-btn active" data-mode="balance" disabled>
+                        💰 Balance-Based Streaming
+                    </button>
+                    <button class="mode-btn" data-mode="time" disabled>
+                        ⏱️ Time-Based Precision Billing
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mode A: Balance-Based Streaming (Per-Session Cap) -->
+            <div id="modeBalance" class="mode-content active">
+                <h3>💰 Balance-Based Streaming (Per-Session Cap)</h3>
+                <div class="input-group">
+                    <label>Set Session Maximum Amount</label>
+                    <div class="currency-input">
+                        <select id="currencySelect">
+                            <option value="INR">₹ INR</option>
+                            <option value="USD">$ USD</option>
+                            <option value="EUR">€ EUR</option>
+                        </select>
+                        <input type="number" id="maxAmount" placeholder="e.g., 500" min="0" step="0.01">
+                    </div>
+                </div>
+                <button id="setMaxAmount" class="btn-primary">💰 Set Session Limit</button>
+                <small style="display: block; margin-top: 0.5rem; color: #8b5cf6; font-size: 0.85rem;">⏱️ This limit applies to CURRENT SESSION only</small>
+                
+                <div class="live-metrics">
+                    <div class="metric-card">
+                        <span class="metric-label">Amount Spent</span>
+                        <span class="metric-value" id="amountSpent">₹0.00</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">Remaining</span>
+                        <span class="metric-value" id="amountRemaining">₹0.00</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">Usage %</span>
+                        <span class="metric-value" id="usagePercent">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mode B: Time-Based Precision Billing -->
+            <div id="modeTime" class="mode-content hidden">
+                <h3>Time-Based Precision Billing</h3>
+                <div class="input-group">
+                    <label>Set Pricing</label>
+                    <div class="time-pricing">
+                        <div>
+                            <label>Rate per Hour:</label>
+                            <div class="currency-input">
+                                <select id="timeCurrencySelect">
+                                    <option value="INR">₹ INR</option>
+                                    <option value="USD">$ USD</option>
+                                    <option value="EUR">€ EUR</option>
+                                </select>
+                                <input type="number" id="ratePerHour" placeholder="e.g., 50" min="0" step="0.01">
+                            </div>
+                        </div>
+                        <div>
+                            <label>OR Rate per Minute:</label>
+                            <input type="number" id="ratePerMinute" placeholder="e.g., 1" min="0" step="0.001">
+                        </div>
+                    </div>
+                </div>
+                <button id="setTimeRate" class="btn-primary">Set Rate</button>
+
+                <div class="live-metrics">
+                    <div class="metric-card">
+                        <span class="metric-label">Time Elapsed</span>
+                        <span class="metric-value" id="timeElapsed">0h 0m 0s</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">Current Cost</span>
+                        <span class="metric-value" id="currentCost">₹0.00</span>
+                    </div>
+                    <div class="metric-card">
+                        <span class="metric-label">Cost/Hour</span>
+                        <span class="metric-value" id="costPerHour">₹0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Service Control -->
+            <div class="service-controls">
+                <button id="startService" class="btn-success" disabled>▶ Start Service</button>
+                <button id="stopService" class="btn-danger hidden" disabled>⏹ Stop Service</button>
+            </div>
+        </section>
+
+        <!-- Right Panel: Settings & Notifications -->
+        <section class="panel settings-panel">
+            <h2>Safety Controls</h2>
+            
+            <!-- UNIVERSAL SPENDING CAP (Global Lifetime Limit) -->
+            <div class="setting-item">
+                <label style="font-weight: 600; color: #ef4444;">🔒 Universal Spending Cap</label>
+                <small style="display: block; margin-bottom: 1rem; color: #f59e0b;">Lifetime limit across ALL sessions</small>
+                
+                <input type="number" id="universalCapInput" placeholder="Enter max lifetime spending amount" min="0" step="0.01" style="width: 100%; padding: 0.75rem; font-size: 1rem; border: 2px solid #6366f1; border-radius: 8px; background: var(--bg-secondary); color: var(--text-primary); margin-bottom: 0.75rem; box-sizing: border-box;">
+                
+                <button id="setUniversalCap" class="btn-primary" style="width: 100%; padding: 0.75rem; font-size: 1rem; font-weight: 600;">🔒 Set Universal Cap</button>
+                
+                <div id="universalCapDisplay" style="margin-top: 1rem; padding: 0.75rem; font-size: 0.95rem; font-weight: 600; color: #6b7280; background: rgba(99, 102, 241, 0.1); border-radius: 6px; text-align: center;">
+                    ⏳ Not set yet
+                </div>
+                
+                <button id="resetUniversalCap" class="btn-secondary" style="width: 100%; margin-top: 0.75rem; padding: 0.75rem; font-size: 0.9rem; font-weight: 600; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; transition: all 0.3s ease;">
+                    🔄 Reset Universal Cap & Spending
+                </button>
+                
+                <small style="display: block; margin-top: 0.75rem; color: #ef4444;">⚠️ Once reached, NO new sessions allowed</small>
+            </div>
+
+            <hr style="margin: 1.5rem 0;">
+
+            <!-- SESSION SPENDING CAP (Per-Session Limit - set in Balance Mode) -->
+            <div class="setting-item">
+                <label style="font-weight: 600; color: #3b82f6;">💰 Session Spending Cap</label>
+                <small style="display: block; margin-bottom: 0.5rem; color: #8b5cf6;">Set in Balance-Based Mode above</small>
+                <small style="color: #6b7280;">Configured in Balance Mode card</small>
+            </div>
+
+            <hr style="margin: 1.5rem 0;">
+
+            <div class="setting-item">
+                <label>
+                    <input type="checkbox" id="enableNotification" checked>
+                    Sound Alert on Limit Reached
+                </label>
+            </div>
+
+            <div class="setting-item">
+                <label>
+                    <input type="checkbox" id="autoStopEnabled" checked>
+                    Auto-Stop Service at Cap
+                </label>
+            </div>
+
+            <hr style="margin-top: 1.5rem;">
+
+            <h2>Session Summary</h2>
+            <div class="summary-box">
+                <p><strong>Session ID:</strong> <span id="sessionId">—</span></p>
+                <p><strong>Started:</strong> <span id="sessionStart">—</span></p>
+                <p><strong>Total Used:</strong> <span id="totalUsed">₹0.00</span></p>
+                <p><strong>Status:</strong> <span id="sessionStatus" class="status-idle">Idle</span></p>
+            </div>
+
+            <button id="settlePayment" class="btn-primary" disabled>💸 Settle & Pay</button>
+            <button id="exportData" class="btn-secondary">📥 Export Data</button>
+        </section>
+    </main>
+
+    <!-- IoT Device Simulator Panel -->
+    <section class="panel iot-panel">
+        <h2>📱 IoT Device Simulator</h2>
+        <div class="iot-controls">
+            <div class="device-card">
+                <h4>Simulated Device</h4>
+                <p id="deviceStatus" class="device-status-idle">Status: Idle</p>
+                <p id="deviceUptime">Uptime: 0s</p>
+                <button id="simulateDeviceStart" class="btn-primary">Start Device</button>
+                <button id="simulateDeviceStop" class="btn-danger hidden">Stop Device</button>
+            </div>
+            <div class="device-card">
+                <h4>Simulated Consumption</h4>
+                <p>Power: <span id="devicePower">0</span> W</p>
+                <p>Data: <span id="deviceData">0</span> MB</p>
+                <p>Usage: <span id="deviceUsage">0</span> %</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gmail Authentication Modal -->
+    <div id="gmailAuthModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+        <div style="background: var(--bg-secondary); padding: 2rem; border-radius: 12px; width: 90%; max-width: 400px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+            <h2 id="authModalTitle" style="margin-top: 0; margin-bottom: 1.5rem;">Gmail Sign-Up</h2>
+            
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Email</label>
+                <input type="email" id="authModalEmail" placeholder="example@gmail.com" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-primary); color: var(--text-primary); font-family: inherit;">
+            </div>
+            
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Password</label>
+                <input type="password" id="authModalPassword" placeholder="Minimum 6 characters" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-primary); color: var(--text-primary); font-family: inherit;">
+            </div>
+            
+            <div style="margin-bottom: 1rem;" id="authModalConfirmPasswordGroup">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;" id="confirmPasswordLabel">Confirm Password</label>
+                <input type="password" id="authModalPasswordConfirm" placeholder="Confirm password" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-primary); color: var(--text-primary); font-family: inherit;">
+            </div>
+            
+            <div style="margin-bottom: 1rem;" id="authModalError"></div>
+            
+            <div style="display: flex; gap: 0.5rem;">
+                <button id="authModalSubmit" style="flex: 1; padding: 0.75rem; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Sign-Up</button>
+                <button id="authModalCancel" style="flex: 1; padding: 0.75rem; background: #6b7280; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <p>U2PAY v1.0 | Web3 Continuous Flow Payment Rail | Pay Only What You Use</p>
+        <p><a href="pages/docs.html" target="_blank">Documentation & FAQ</a> | Status: Live</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="auth/wallet.js"></script>
+    <script src="components/streaming.js"></script>
+    <script src="utils/fiatConversion.js"></script>
+    <script src="components/uiUpdater.js"></script>
+    <script src="utils/websocketClient.js"></script>
+    <script src="utils/app.js"></script>
+</body>
+</html>
